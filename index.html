@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mekansal Değerlendirme Anketi</title>
+    <style>
+        :root {
+            --primary-blue: #3b59fe;
+            --accent-purple: #6156e1;
+            --text-dark: #333;
+            --border-gray: #e1e4e8;
+            --bg-body: #f0f2f5;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg-body);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 550px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+            padding: 30px;
+        }
+
+        .header-title {
+            color: var(--accent-purple);
+            text-align: center;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+
+        .question-label {
+            display: block;
+            margin: 25px 0 12px 0;
+            font-weight: 700;
+            font-size: 16px;
+            color: #1a1a1a;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 8px;
+        }
+
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-gray);
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            background-color: #fafafa;
+        }
+
+        .radio-group, .checkbox-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: #fdfdfd;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .radio-item, .check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14.5px;
+            cursor: pointer;
+        }
+
+        .slider-wrapper { 
+            margin-bottom: 20px; 
+            padding: 15px;
+            background: #f9f9ff;
+            border-radius: 12px;
+        }
+        .slider-text { font-size: 14px; font-weight: 600; margin-bottom: 10px; display: block; color: #444; }
+        
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            background: var(--accent-purple);
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .range-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            color: #777;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 0 5px;
+        }
+
+        .btn-submit { 
+            background: var(--accent-purple); 
+            color: white; 
+            border: none; 
+            width: 100%; 
+            padding: 18px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 16px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(97, 86, 225, 0.3);
+        }
+
+        .btn-submit:hover { opacity: 0.9; }
+        .btn-submit:disabled { background: #a0a0a0; cursor: not-allowed; }
+
+        input[type="radio"], input[type="checkbox"] {
+            transform: scale(1.2);
+            accent-color: var(--accent-purple);
+        }
+
+        .location-box {
+            background: #f9f9ff; 
+            padding: 15px; 
+            border-radius: 12px; 
+            border: 1px solid #e1e4e8; 
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-title">Mekansal Değerlendirme Anketi</div>
+
+    <form id="surveyForm">
+        
+        <label class="question-label">Katılımcı ID</label>
+        <input type="text" id="kisi_id" name="kisi_id" readonly style="background-color: #e9ecef; color: #777; cursor: not-allowed;" title="Bu ID cihazınıza özel otomatik olarak atanmıştır.">
+
+        <label class="question-label">Konum Bilgisi</label>
+        <div class="location-box">
+            <button type="button" class="btn-submit" style="margin-top: 0; padding: 12px; font-size: 14px;" onclick="konumAl()">📍 Konumumu Kaydet</button>
+            <p id="konum_sonuc" style="font-size: 13px; color: #555; margin-top: 10px;">Konum henüz alınmadı. Lütfen konum kaydet butonuna tıklayın.</p>
+        </div>
+        
+        <input type="hidden" id="enlem" name="enlem" required>
+        <input type="hidden" id="boylam" name="boylam" required>
+
+        <label class="question-label">1. Şu anda neredesin?</label>
+        <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="q1" value="ev"> Evimdeyim.</label>
+            <label class="radio-item"><input type="radio" name="q1" value="bahce"> Oturduğum konutun bahçesindeyim.</label>
+            <label class="radio-item"><input type="radio" name="q1" value="sokak"> Oturduğum konutun yakınındaki sokaktayım.</label>
+            <label class="radio-item"><input type="radio" name="q1" value="park"> Mahallemdeki parkta/oyun alanındayım.</label>
+            <label class="radio-item"><input type="radio" name="q1" value="spor"> Spor alanındayım.</label>
+            <label class="radio-item"><input type="radio" name="q1" value="bos_alan"> Mahallemdeki boş bir açık alandayım.</label>
+            <label class="radio-item"><input type="radio" name="q1" value="avm"> Alışveriş merkezindeyim.</label>
+            <label class="radio-item"><input type="radio" name="q1" value="ticari"> Kafe/market/restoran gibi bir ticari alandayım.</label>
+            <label class="radio-item"><input type="radio" name="q1" value="yol"> Yolda/hareket halindeyim.</label>
+            <label class="radio-item"><input type="radio" name="q1" value="doga"> Doğa/yürüyüş yolu/ormandayım.</label>
+            <label class="radio-item"><input type="radio" name="q1" value="kulup"> Çocuk/gençlik kulübündeyim.</label>
+            <label class="radio-item"><input type="radio" name="q1" value="baska"> Başka bir yerdeyim.</label>
+        </div>
+
+        <label class="question-label">2. Bu mekana kiminle geldin?</label>
+        <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="q2" value="yalniz"> Yalnız</label>
+            <label class="radio-item"><input type="radio" name="q2" value="arkadas"> Arkadaş(lar)ımla</label>
+            <label class="radio-item"><input type="radio" name="q2" value="kardes"> Kardeşimle</label>
+            <label class="radio-item"><input type="radio" name="q2" value="ebeveyn"> Ebeveynlerimle</label>
+            <label class="radio-item"><input type="radio" name="q2" value="aile_diger"> Ailemin diğer üyeleriyle</label>
+        </div>
+
+        <label class="question-label">3. Bulunduğun mekana gelmeyi sen mi tercih ettin?</label>
+        <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="q3" value="evet"> Evet</label>
+            <label class="radio-item"><input type="radio" name="q3" value="kismen"> Kısmen</label>
+            <label class="radio-item"><input type="radio" name="q3" value="hayir"> Hayır</label>
+        </div>
+
+        <label class="question-label">4. Bulunduğun mekana nasıl ulaştın?</label>
+        <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="q4" value="yuruyerek"> Yürüyerek</label>
+            <label class="radio-item"><input type="radio" name="q4" value="bisiklet"> Bisikletle/Scooterla</label>
+            <label class="radio-item"><input type="radio" name="q4" value="toplu"> Toplu taşıma aracıyla</label>
+            <label class="radio-item"><input type="radio" name="q4" value="ozel"> Özel aracımızla</label>
+            <label class="radio-item"><input type="radio" name="q4" value="taksi"> Taksiyle</label>
+        </div>
+
+        <label class="question-label">5. Ne kadar süredir bu mekanda bulunuyorsun?</label>
+        <select name="q5">
+            <option value="0-30">0-30 dakika</option>
+            <option value="30-45">30-45 dakika</option>
+            <option value="45-60">45-60 dakika</option>
+            <option value="60+">60 dakikadan fazla</option>
+        </select>
+
+        <label class="question-label">6. Şu anda bu mekanda ne tür aktivite yapıyorsun?</label>
+        <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="q6" value="oyun"> Oyun oynuyorum.</label>
+            <label class="radio-item"><input type="radio" name="q6" value="yuruyus"> Yürüyüş yapıyorum.</label>
+            <label class="radio-item"><input type="radio" name="q6" value="spor"> Spor yapıyorum.</label>
+            <label class="radio-item"><input type="radio" name="q6" value="arkadaslar"> Arkadaşlarımla vakit geçiyorum.</label>
+            <label class="radio-item"><input type="radio" name="q6" value="dinlenme"> Dinleniyorum.</label>
+            <label class="radio-item"><input type="radio" name="q6" value="kitap"> Kitap okuyorum.</label>
+            <label class="radio-item"><input type="radio" name="q6" value="dijital"> Telefon/tablet vb. ilgileniyorum.</label>
+            <label class="radio-item"><input type="radio" name="q6" value="baska"> Başka.</label>
+        </div>
+
+        <label class="question-label">7. Bu mekanı nasıl değerlendiriyorsun? (Çoklu Seçim)</label>
+        <div class="checkbox-grid">
+            <label class="check-item"><input type="checkbox" name="q7_temiz" value="Evet"> Temiz, bakımlı</label>
+            <label class="check-item"><input type="checkbox" name="q7_kirli" value="Evet"> Kirli</label>
+            <label class="check-item"><input type="checkbox" name="q7_eglenceli" value="Evet"> Eğlenceli</label>
+            <label class="check-item"><input type="checkbox" name="q7_canli" value="Evet"> Kalabalık ve canlı</label>
+            <label class="check-item"><input type="checkbox" name="q7_sikici" value="Evet"> Tenha ve sıkıcı</label>
+            <label class="check-item"><input type="checkbox" name="q7_guvenli" value="Evet"> Güvenli</label>
+            <label class="check-item"><input type="checkbox" name="q7_guvensiz" value="Evet"> Güvensiz, tedirgin edici</label>
+            <label class="check-item"><input type="checkbox" name="q7_rahatsiz" value="Evet"> Rahatsız edici unsurlar var</label>
+            <label class="check-item"><input type="checkbox" name="q7_rahatlatici" value="Evet"> Rahatlatıcı unsurlar var</label>
+            <label class="check-item"><input type="checkbox" name="q7_zor" value="Evet"> Erişimi zor</label>
+            <label class="check-item"><input type="checkbox" name="q7_kolay" value="Evet"> Kolay erişilebilir</label>
+        </div>
+
+        <label class="question-label">8. Bu mekanda kendinizi nasıl hissediyorsunuz?</label>
+        <div class="slider-wrapper">
+            <span class="slider-text">Şu anda bulunduğum yeri seviyorum.</span>
+            <input type="range" name="q8_1" min="1" max="5" value="3">
+            <div class="range-labels"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        </div>
+        <div class="slider-wrapper">
+            <span class="slider-text">Burada kendimi güvende hissediyorum.</span>
+            <input type="range" name="q8_2" min="1" max="5" value="3">
+            <div class="range-labels"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        </div>
+        <div class="slider-wrapper">
+            <span class="slider-text">Burada kendimi özgür hissediyorum.</span>
+            <input type="range" name="q8_3" min="1" max="5" value="3">
+            <div class="range-labels"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        </div>
+        <div class="slider-wrapper">
+            <span class="slider-text">Burada kendimi rahat/huzurlu hissediyorum.</span>
+            <input type="range" name="q8_4" min="1" max="5" value="3">
+            <div class="range-labels"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        </div>
+        <div class="slider-wrapper">
+            <span class="slider-text">Burası bana aitmiş gibi hissediyorum.</span>
+            <input type="range" name="q8_5" min="1" max="5" value="3">
+            <div class="range-labels"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        </div>
+
+        <label class="question-label">9. Mekanın hissettirdikleri</label>
+        <div class="slider-wrapper">
+            <span class="slider-text">Şu anda ne kadar mutlusun?</span>
+            <input type="range" name="q9_1" min="1" max="5" value="3">
+            <div class="range-labels"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        </div>
+        <div class="slider-wrapper">
+            <span class="slider-text">Şu anda ne kadar stresli/gerginsin?</span>
+            <input type="range" name="q9_2" min="1" max="5" value="3">
+            <div class="range-labels"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        </div>
+        <div class="slider-wrapper">
+            <span class="slider-text">Şu anda ne kadar enerjiksin?</span>
+            <input type="range" name="q9_3" min="1" max="5" value="3">
+            <div class="range-labels"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        </div>
+
+        <label class="question-label">10. Eklemek istediğin yorumlar:</label>
+        <textarea name="yorumlar" rows="4" placeholder="Düşüncelerinizi buraya yazabilirsiniz..."></textarea>
+
+        <button type="submit" id="submitBtn" class="btn-submit">✓ ANKETİ TAMAMLA VE GÖNDER</button>
+    </form>
+</div>
+
+<script>
+    // 1. Google Apps Script Web App URL'niz
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzH9q9IS2zHywcnGRA_6ml-y_EZo4eWZX1pqABgJxei1Hgzq4t4UUaBOWztyhnyI53Ozg/exec';
+
+    // 2. Uygulama açıldığında otomatik ID oluşturma
+    window.onload = function() {
+        let cihazId = localStorage.getItem('anket_cihaz_id');
+        if (!cihazId) {
+            cihazId = 'ID-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+            localStorage.setItem('anket_cihaz_id', cihazId);
+        }
+        document.getElementById('kisi_id').value = cihazId;
+    };
+
+    // 3. Konum Alma Fonksiyonu
+    function konumAl() {
+        const sonucMetni = document.getElementById('konum_sonuc');
+        const enlemInput = document.getElementById('enlem');
+        const boylamInput = document.getElementById('boylam');
+        
+        sonucMetni.innerText = "Konum aranıyor, lütfen bekleyin...";
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    enlemInput.value = position.coords.latitude;
+                    boylamInput.value = position.coords.longitude;
+                    sonucMetni.innerText = "✓ Konum başarıyla kaydedildi!";
+                    sonucMetni.style.color = "green";
+                },
+                function(error) {
+                    sonucMetni.innerText = "Konum alınamadı. İzin vermemiş olabilirsiniz.";
+                    sonucMetni.style.color = "red";
+                },
+                { enableHighAccuracy: true }
+            );
+        } else {
+            sonucMetni.innerText = "Tarayıcınız konum özelliğini desteklemiyor.";
+        }
+    }
+
+    // 4. Form Gönderme Fonksiyonu (Konum bypass destekli)
+    document.getElementById('surveyForm').addEventListener('submit', function(e) {
+        e.preventDefault(); 
+
+        // Konum kontrolü ve kullanıcıya sorarak atlama
+        if(!document.getElementById('enlem').value) {
+            let onay = confirm("Konum bilginiz alınamadı. Anketi yine de konum bilgisi olmadan göndermek istiyor musunuz?");
+            if(!onay) {
+                return; // Kullanıcı iptal etti, gönderme
+            } else {
+                // Hata almamak için boş değer ataması
+                document.getElementById('enlem').value = "Bulunamadı";
+                document.getElementById('boylam').value = "Bulunamadı";
+            }
+        }
+
+        const btn = document.getElementById('submitBtn');
+        btn.innerText = "Gönderiliyor...";
+        btn.disabled = true;
+
+        const formData = new FormData(this);
+
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            body: formData,
+            mode: 'no-cors' 
+        })
+        .then(() => {
+            alert("Anket başarıyla gönderildi! Katılımınız için teşekkürler.");
+            
+            // Formu temizle ama Cihaz ID'sini koru
+            const mevcutId = document.getElementById('kisi_id').value;
+            document.getElementById('surveyForm').reset();
+            document.getElementById('kisi_id').value = mevcutId; 
+            
+            // Konum arayüzünü sıfırla
+            document.getElementById('konum_sonuc').innerText = "Konum henüz alınmadı. Lütfen konum kaydet butonuna tıklayın.";
+            document.getElementById('konum_sonuc').style.color = "#555";
+            document.getElementById('enlem').value = "";
+            document.getElementById('boylam').value = "";
+            
+            btn.innerText = "✓ ANKETİ TAMAMLA VE GÖNDER";
+            btn.disabled = false;
+        })
+        .catch(error => {
+            alert("Bir hata oluştu. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.");
+            btn.innerText = "Tekrar Dene";
+            btn.disabled = false;
+        });
+    });
+</script>
+
+</body>
+</html>
